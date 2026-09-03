@@ -1,0 +1,9 @@
+{
+  "name": "bayt-toot-backend",
+  "version": "1.0.0",
+  "description": "سيرفر موقع مطعم بيت التوت",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  }
+}
