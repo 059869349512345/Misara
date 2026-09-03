@@ -8,8 +8,8 @@ const path = require('path');
 const url = require('url');
 
 const PORT = process.env.PORT || 3000;
-const PUBLIC_DIR = path.join(__dirname, 'public');
-const DATA_FILE = path.join(__dirname, 'data', 'reservations.json');
+const PUBLIC_DIR = __dirname;
+const DATA_FILE = path.join(__dirname, 'reservations.json');
 
 // كلمة سر بسيطة لصفحة الإدارة (غيّرها لأي شي بتحبه)
 const ADMIN_PASSWORD = 'bayttoot2026';
