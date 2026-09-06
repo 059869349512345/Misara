@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>القائمة — البيت العربي</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+  .chip-row{
+    display:flex;gap:10px;overflow-x:auto;padding-bottom:6px;margin-bottom:28px;
+    scrollbar-width:none;
+  }
+  .chip-row::-webkit-scrollbar{display:none;}
+  .chip{
+    flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:8px;
+    cursor:pointer;padding:4px;
+  }
+  .chip-icon{
+    width:58px;height:58px;border-radius:16px;
+    display:flex;align-items:center;justify-content:center;font-size:26px;
+    background:var(--card);border:1.5px solid var(--line);
+    transition:all .2s ease;
+  }
+  .chip.active .chip-icon{background:var(--orange);border-color:var(--orange);transform:translateY(-2px);}
+  .chip-label{font-size:12px;font-weight:700;color:var(--grey);white-space:nowrap;}
+  .chip.active .chip-label{color:var(--orange-deep);}
+
+  .count-pill{
+    display:inline-block;background:var(--orange-soft);color:var(--orange-deep);
+    font-size:12px;font-weight:800;padding:5px 14px;border-radius:20px;margin-bottom:20px;
+  }
+
+  .rich-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+  @media(max-width:900px){.rich-grid{grid-template-columns:repeat(2,1fr);}}
+  @media(max-width:560px){.rich-grid{grid-template-columns:1fr;}}
+
+  .rich-card{
+    background:var(--card);border:1px solid var(--line);border-radius:20px;overflow:hidden;
+    transition:transform .22s ease, box-shadow .22s ease;position:relative;
+  }
+  .rich-card:hover{transform:translateY(-4px);box-shadow:0 16px 32px rgba(0,0,0,0.08);}
+  .rich-img{
+    height:150px;display:flex;align-items:center;justify-content:center;font-size:56px;position:relative;
+  }
+  .fav-heart{
+    position:absolute;top:12px;left:12px;width:34px;height:34px;border-radius:50%;
+    background:rgba(255,255,255,0.9);display:flex;align-items:center;justify-content:center;
+    font-size:16px;cursor:pointer;user-select:none;box-shadow:0 2px 8px rgba(0,0,0,0.08);
+  }
+  .fav-heart.active{color:#e8455c;}
+  .badge-featured{
+    position:absolute;top:12px;right:12px;background:var(--green);color:#fff;
+    font-size:11px;font-weight:800;padding:4px 10px;border-radius:8px;
+  }
+  .rich-body{padding:16px 18px;}
+  .rich-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;gap:8px;}
+  .rich-name{font-weight:800;font-size:15px;}
+  .rich-price{
+    background:var(--orange-soft);color:var(--orange-deep);
+    font-weight:800;font-size:13px;padding:5px 12px;border-radius:10px;white-space:nowrap;
+  }
+  .rich-desc{font-size:12.5px;color:var(--grey);line-height:1.6;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="topbar">
+    <div class="logo-row">
+      <div class="logo-badge">🍽️</div>
+      <div class="logo-text">البيت العربي</div>
+    </div>
+    <div class="location-pill">📍 شارع الجلاء، غزة ⌄</div>
+    <div class="search-bar">🔍 دوّر عن طبق أو صنف...</div>
+    <a href="contact.html" class="call-btn"><span>📞 </span>احجز الآن</a>
+  </div>
+  <div class="nav-strip">
+    <a href="index.html">الرئيسية</a>
+    <a href="menu.html" class="active">القائمة</a>
+    <a href="about.html">قصتنا</a>
+    <a href="contact.html">تواصل معنا</a>
+  </div>
+</header>
+
+<div class="page-banner">
+  <div class="inner">
+    <h1>قائمة الطعام</h1>
+    <p>نكهات من كل مكان — شرقية، غربية، وإيطالية، محضّرة طازة كل يوم</p>
+  </div>
+</div>
+
+<section id="menu">
+  <div class="wrap">
+    <div class="chip-row" id="chipRow"></div>
+    <div class="count-pill" id="countPill"></div>
+    <div class="rich-grid" id="dishGrid"></div>
+  </div>
+</section>
+
+<footer>
+  <div class="logo-row">
+    <div class="logo-badge">🍽️</div>
+    <div class="logo-text">البيت العربي</div>
+  </div>
+  <div class="foot-links">
+    <a href="index.html">الرئيسية</a>
+    <a href="menu.html">القائمة</a>
+    <a href="about.html">قصتنا</a>
+    <a href="contact.html">تواصل معنا</a>
+  </div>
+  <div class="foot-fine">© 2026 البيت العربي. جميع الحقوق محفوظة.</div>
+</footer>
+
+<script>
+  const CATEGORIES = [
+    {id:'all', label:'الكل', icon:'🍽️'},
+    {id:'eastern', label:'شرقي', icon:'🍚'},
+    {id:'western', label:'غربي', icon:'🍔'},
+    {id:'italian', label:'إيطالي', icon:'🍕'},
+    {id:'grill', label:'مشاوي', icon:'🍢'},
+    {id:'sandwich', label:'سندويشات', icon:'🥙'},
+    {id:'dessert', label:'حلويات', icon:'🍮'},
+    {id:'drinks', label:'مشروبات', icon:'☕'},
+  ];
+
+  const DISHES = [
+    {cat:'eastern', name:'مقلوبة دجاج', desc:'رز، باذنجان، دجاج بلدي، مكسرات محمّصة', price:45, emoji:'🍚', bg:'#FFE9DD', featured:true},
+    {cat:'eastern', name:'مسخّن على الطابون', desc:'خبز طابون، بصل مكرمل، سماق، دجاج', price:42, emoji:'🫓', bg:'#FFF3D6'},
+    {cat:'eastern', name:'محشي بيتي', desc:'ورق عنب وكوسا، مرقة لبن أو بندورة', price:38, emoji:'🍆', bg:'#E4F5E9'},
+    {cat:'eastern', name:'منسف بالدجاج', desc:'رز، لبن جميد، دجاج، مكسرات', price:48, emoji:'🍛', bg:'#E8EEFB', featured:true},
+
+    {cat:'western', name:'برجر لحم أنغوس', desc:'قرص لحم مشوي، جبنة شيدر، صوص خاص', price:38, emoji:'🍔', bg:'#FFE9DD', featured:true},
+    {cat:'western', name:'ستيك مشوي', desc:'قطعة لحم مشوية متبّلة، بطاطا مشوية', price:65, emoji:'🥩', bg:'#E4F5E9'},
+    {cat:'western', name:'دجاج بارميزان', desc:'صدر دجاج مقرمش، صلصة طماطم، جبنة موزاريلا', price:42, emoji:'🍗', bg:'#FFF3D6'},
+    {cat:'western', name:'سلطة سيزر', desc:'خس، دجاج مشوي، جبنة بارميزان، صوص سيزر', price:28, emoji:'🥗', bg:'#E8EEFB'},
+
+    {cat:'italian', name:'بيتزا مارجريتا', desc:'صلصة بندورة إيطالية، موزاريلا طازجة، ريحان', price:32, emoji:'🍕', bg:'#FFE9DD', featured:true},
+    {cat:'italian', name:'باستا ألفريدو', desc:'باستا كريمية، جبنة بارميزان، فطر', price:35, emoji:'🍝', bg:'#FFF3D6'},
+    {cat:'italian', name:'لازانيا لحمة', desc:'طبقات باستا، لحمة مفرومة، جبنة، صلصة بشاميل', price:40, emoji:'🧆', bg:'#E4F5E9'},
+    {cat:'italian', name:'ريزوتو فطر', desc:'أرز إيطالي كريمي، فطر طازج، جبنة بارميزان', price:38, emoji:'🍚', bg:'#E8EEFB'},
+
+    {cat:'grill', name:'مشاوي مشكل', desc:'كباب، شقف، كفتة، أرز وسلطة', price:55, emoji:'🍢', bg:'#FFE9DD', featured:true},
+    {cat:'grill', name:'فراخ مشوية', desc:'نص فروج متبّل، ثوميّة، خبز', price:40, emoji:'🍗', bg:'#FFF3D6'},
+    {cat:'grill', name:'شقف لحمة', desc:'لحمة بلدي متبّلة، بصل مشوي', price:58, emoji:'🥩', bg:'#E4F5E9'},
+    {cat:'grill', name:'كباب حلبي', desc:'كباب مشوي متبّل بالبهارات الحلبية', price:45, emoji:'🍖', bg:'#E8EEFB'},
+
+    {cat:'sandwich', name:'شاورما دجاج', desc:'دجاج متبّل، ثوميّة، خضار طازة', price:22, emoji:'🌯', bg:'#FFE9DD'},
+    {cat:'sandwich', name:'شاورما لحمة', desc:'لحمة بلدي، طحينة، بصل ومخلل', price:25, emoji:'🌯', bg:'#FFF3D6'},
+    {cat:'sandwich', name:'فلافل مشكل', desc:'فلافل طازة، حمص، خضار، طحينة', price:14, emoji:'🧆', bg:'#E4F5E9'},
+    {cat:'sandwich', name:'برجر دجاج كرسبي', desc:'دجاج مقرمش، صوص رانش، خس', price:26, emoji:'🍔', bg:'#E8EEFB', featured:true},
+
+    {cat:'dessert', name:'كنافة نابلسية', desc:'جبنة طازة، قطر، فستق حلبي', price:22, emoji:'🍮', bg:'#FFE9DD', featured:true},
+    {cat:'dessert', name:'قطايف بالقشطة', desc:'قطايف محشوة قشطة، قطر، فستق', price:20, emoji:'🥮', bg:'#FFF3D6'},
+    {cat:'dessert', name:'تيراميسو', desc:'حلوى إيطالية بالقهوة والماسكاربوني', price:25, emoji:'🍰', bg:'#E4F5E9'},
+    {cat:'dessert', name:'تشيز كيك فراولة', desc:'قاعدة بسكويت، جبنة كريمية، صوص فراولة', price:26, emoji:'🍰', bg:'#E8EEFB'},
+    {cat:'dessert', name:'مهلبية', desc:'حليب، ماء ورد، فستق حلبي', price:15, emoji:'🥣', bg:'#FFE9DD'},
+
+    {cat:'drinks', name:'قهوة عربية', desc:'هيل طازة، تحمير بيتي', price:8, emoji:'☕', bg:'#E4F5E9'},
+    {cat:'drinks', name:'كابتشينو', desc:'إسبريسو، حليب مبخّر، رغوة كريمية', price:14, emoji:'☕', bg:'#FFE9DD'},
+    {cat:'drinks', name:'شاي بالنعناع', desc:'نعناع بلدي طازة', price:6, emoji:'🍵', bg:'#FFF3D6'},
+    {cat:'drinks', name:'عصير طازة', desc:'حسب موسم الفاكهة', price:12, emoji:'🥤', bg:'#E8EEFB'},
+    {cat:'drinks', name:'ميلك شيك شوكولاتة', desc:'حليب، آيس كريم، شوكولاتة غنية', price:16, emoji:'🥤', bg:'#FFE9DD', featured:true},
+  ];
+
+  const CATEGORY_LABELS = Object.fromEntries(CATEGORIES.map(c => [c.id, c.label]));
+  let currentCat = 'all';
+  const favorites = new Set();
+
+  function renderChips(){
+    const row = document.getElementById('chipRow');
+    row.innerHTML = CATEGORIES.map(c => `
+      <div class="chip ${c.id === currentCat ? 'active' : ''}" data-cat="${c.id}">
+        <div class="chip-icon">${c.icon}</div>
+        <div class="chip-label">${c.label}</div>
+      </div>
+    `).join('');
+    row.querySelectorAll('.chip').forEach(el => {
+      el.addEventListener('click', () => {
+        currentCat = el.dataset.cat;
+        renderChips();
+        renderGrid();
+      });
+    });
+  }
+
+  function renderGrid(){
+    const list = currentCat === 'all' ? DISHES : DISHES.filter(d => d.cat === currentCat);
+    document.getElementById('countPill').textContent = list.length + ' صنف متوفر';
+
+    document.getElementById('dishGrid').innerHTML = list.map((d, i) => {
+      const key = d.cat + '-' + i;
+      return '<div class="rich-card">' +
+        '<div class="rich-img" style="background:' + d.bg + ';">' +
+          '<span>' + d.emoji + '</span>' +
+          '<div class="fav-heart" data-key="' + key + '">🤍</div>' +
+          (d.featured ? '<div class="badge-featured">✦ مميّز</div>' : '') +
+        '</div>' +
+        '<div class="rich-body">' +
+          '<div class="rich-top">' +
+            '<span class="rich-name">' + d.name + '</span>' +
+            '<span class="rich-price">' + d.price + ' ₪</span>' +
+          '</div>' +
+          '<div class="rich-desc">' + d.desc + '</div>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+
+    document.querySelectorAll('.fav-heart').forEach(el => {
+      const key = el.dataset.key;
+      if(favorites.has(key)) { el.textContent = '❤️'; el.classList.add('active'); }
+      el.addEventListener('click', () => {
+        if(favorites.has(key)){ favorites.delete(key); el.textContent = '🤍'; el.classList.remove('active'); }
+        else { favorites.add(key); el.textContent = '❤️'; el.classList.add('active'); }
+      });
+    });
+  }
+
+  renderChips();
+  renderGrid();
+
+  window.addEventListener('DOMContentLoaded', function(){
+    const hash = window.location.hash.replace('#','');
+    if(hash && CATEGORY_LABELS[hash]){
+      currentCat = hash;
+      renderChips();
+      renderGrid();
+    }
+  });
+</script>
+
+</body>
+</html>

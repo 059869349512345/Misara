@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>إدارة الحجوزات — البيت العربي</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --orange:#F9702A; --orange-deep:#E6591A; --bg:#FAF9F7;
+    --card:#fff; --ink:#201A16; --grey:#857D74; --line:#F0ECE6;
+  }
+  *{box-sizing:border-box;}
+  body{background:var(--bg);color:var(--ink);font-family:'Cairo',sans-serif;margin:0;padding:24px;}
+  h1{font-size:22px;margin-bottom:20px;}
+  .login-box{
+    max-width:360px;margin:80px auto;background:var(--card);
+    border:1px solid var(--line);border-radius:16px;padding:32px;text-align:center;
+  }
+  .login-box input{
+    width:100%;padding:12px;border-radius:10px;border:1px solid var(--line);
+    margin:16px 0;font-family:'Cairo',sans-serif;
+  }
+  .login-box button, .refresh-btn{
+    background:var(--orange);color:#fff;border:none;padding:12px 24px;
+    border-radius:10px;font-weight:700;cursor:pointer;font-family:'Cairo',sans-serif;
+  }
+  .error{color:#c0392b;font-size:14px;margin-top:8px;display:none;}
+  table{width:100%;border-collapse:collapse;background:var(--card);border-radius:12px;overflow:hidden;}
+  th,td{padding:12px 14px;text-align:right;border-bottom:1px solid var(--line);font-size:14px;}
+  th{background:var(--orange);color:#fff;font-weight:700;}
+  tr:last-child td{border-bottom:none;}
+  .empty{text-align:center;color:var(--grey);padding:40px;}
+  .top-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px;}
+</style>
+</head>
+<body>
+
+<div id="loginView" class="login-box">
+  <h1>🔒 دخول لوحة الإدارة</h1>
+  <input type="password" id="passwordInput" placeholder="كلمة السر">
+  <div><button onclick="tryLogin()">دخول</button></div>
+  <div class="error" id="loginError">كلمة السر غير صحيحة</div>
+</div>
+
+<div id="dashboardView" style="display:none;">
+  <div class="top-bar">
+    <h1>📋 الحجوزات الواردة</h1>
+    <button class="refresh-btn" onclick="loadReservations()">تحديث ⟳</button>
+  </div>
+  <div id="tableWrap"></div>
+</div>
+
+<script>
+  let savedPassword = '';
+
+  async function tryLogin(){
+    const pass = document.getElementById('passwordInput').value;
+    const res = await fetch('/api/reservations?password=' + encodeURIComponent(pass));
+    if(res.ok){
+      savedPassword = pass;
+      document.getElementById('loginView').style.display = 'none';
+      document.getElementById('dashboardView').style.display = 'block';
+      renderData(await res.json());
+    } else {
+      document.getElementById('loginError').style.display = 'block';
+    }
+  }
+
+  async function loadReservations(){
+    const res = await fetch('/api/reservations?password=' + encodeURIComponent(savedPassword));
+    if(res.ok){
+      renderData(await res.json());
+    }
+  }
+
+  function renderData(result){
+    const wrap = document.getElementById('tableWrap');
+    const list = result.data || [];
+    if(list.length === 0){
+      wrap.innerHTML = '<div class="empty">لسا ما في حجوزات</div>';
+      return;
+    }
+    let html = '<table><tr><th>الاسم</th><th>الهاتف</th><th>عدد الأشخاص</th><th>التاريخ</th><th>ملاحظات</th><th>وقت الطلب</th></tr>';
+    list.forEach(r => {
+      const time = new Date(r.createdAt).toLocaleString('ar-EG');
+      html += `<tr><td>${r.name}</td><td>${r.phone}</td><td>${r.guests}</td><td>${r.date}</td><td>${r.notes || '-'}</td><td>${time}</td></tr>`;
+    });
+    html += '</table>';
+    wrap.innerHTML = html;
+  }
+</script>
+
+</body>
+</html>
